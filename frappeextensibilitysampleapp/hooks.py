@@ -6,7 +6,7 @@ app_email = "cd@citisxys.com"
 app_license = "mit"
 
 # Apps
-# ------------------
+# ------------------frappeextensibilitysampleapp
 
 # required_apps = []
 
