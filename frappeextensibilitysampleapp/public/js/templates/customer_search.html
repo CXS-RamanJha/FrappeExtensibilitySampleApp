@@ -1,0 +1,35 @@
+{% extends "ivendnext_pos/public/js/templates/customer_search.html" %}
+
+{% block on_customer_search_ok_click_block %}
+beforeCustomerChange();
+{{super()}}
+<!-- afterCustomerChange(); -->
+{% endblock %}
+
+{% block customer_search_script_block %}
+{{super()}}
+
+
+<script>
+   
+    
+    $(document).ready(function(){
+   
+       });
+
+       function beforeCustomerChange(){
+        let selection = customer_search_grid.getSelection();
+        frappe.msgprint(`Before Customer Change ${cur_frm.doc.customer_name}`);
+        frappe.msgprint(`Customer changing to ${selection.customer_name}`);
+        
+       }
+
+       function afterCustomerChange(){
+        let selection = customer_search_grid.getSelection();
+        frappe.msgprint(`After Customer Change ${cur_frm.doc.customer_name}`);
+        frappe.msgprint(`Customer changed to ${cur_frm.doc.customer_name}}`);
+        
+       }
+
+</script>
+{% endblock %}

@@ -8,6 +8,10 @@ app_license = "mit"
 # Apps
 # ------------------frappeextensibilitysampleapp1
 
+app_include_js = [
+	"frappeextensibilitysampleapp.bundle.js"
+]
+
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
