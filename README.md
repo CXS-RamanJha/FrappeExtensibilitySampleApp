@@ -1,0 +1,7 @@
+## FrappeExtensibilitySampleApp
+
+FrappeExtensibilitySampleApp
+
+#### License
+
+mit
