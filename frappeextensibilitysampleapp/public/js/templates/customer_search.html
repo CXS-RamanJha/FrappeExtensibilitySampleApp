@@ -9,9 +9,7 @@ beforeCustomerChange();
 {% block customer_search_script_block %}
 {{super()}}
 
-
-<script>
-   
+<script>   
     
     $(document).ready(function(){
    
@@ -20,16 +18,13 @@ beforeCustomerChange();
        function beforeCustomerChange(){
         let selection = customer_search_grid.getSelection();
         frappe.msgprint(`Before Customer Change ${cur_frm.doc.customer_name}`);
-        frappe.msgprint(`Customer changing to ${selection.customer_name}`);
-        
+        frappe.msgprint(`Customer changing to ${selection.customer_name}`);        
        }
 
        function afterCustomerChange(){
         let selection = customer_search_grid.getSelection();
         frappe.msgprint(`After Customer Change ${cur_frm.doc.customer_name}`);
-        frappe.msgprint(`Customer changed to ${cur_frm.doc.customer_name}}`);
-        
+        frappe.msgprint(`Customer changed to ${cur_frm.doc.customer_name}}`);        
        }
-
 </script>
 {% endblock %}
