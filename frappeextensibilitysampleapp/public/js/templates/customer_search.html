@@ -1,9 +1,9 @@
 {% extends "ivendnext_pos/public/js/templates/customer_search.html" %}
 
 {% block on_customer_search_ok_click_block %}
-beforeCustomerChange();
+frappe.pos_interface_builder.pos_commands.beforeCustomerChange();
 {{super()}}
-afterCustomerChange();
+frappe.pos_interface_builder.pos_commands.afterCustomerChange();
 {% endblock %}
 
 {% block customer_search_script_block %}

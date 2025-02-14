@@ -31,11 +31,11 @@ app_include_js = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/frappeextensibilitysampleapp/css/frappeextensibilitysampleapp.css"
-# app_include_js = "/assets/frappeextensibilitysampleapp/js/frappeextensibilitysampleapp.js"
+# app_include_js = "/frappeextensibilitysampleapp/page/custom_pos_commands_.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/frappeextensibilitysampleapp/css/frappeextensibilitysampleapp.css"
-# web_include_js = "/assets/frappeextensibilitysampleapp/js/frappeextensibilitysampleapp.js"
+#web_include_js = "/public/js/frappeextensibilitysampleapp.bundle.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "frappeextensibilitysampleapp/public/scss/website"
