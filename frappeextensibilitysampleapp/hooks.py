@@ -9,7 +9,8 @@ app_license = "mit"
 # ------------------frappeextensibilitysampleapp1
 
 app_include_js = [
-	"frappeextensibilitysampleapp.bundle.js"
+	"frappeextensibilitysampleapp.bundle.js",
+	"/assets/frappeextensibilitysampleapp/js/custom_pos_transaction_customer.js"
 ]
 
 # required_apps = []

@@ -3,7 +3,7 @@
 {% block on_customer_search_ok_click_block %}
 beforeCustomerChange();
 {{super()}}
-<!-- afterCustomerChange(); -->
+afterCustomerChange();
 {% endblock %}
 
 {% block customer_search_script_block %}
@@ -16,15 +16,26 @@ beforeCustomerChange();
        });
 
        function beforeCustomerChange(){
+      
         let selection = customer_search_grid.getSelection();
-        frappe.msgprint(`Before Customer Change ${cur_frm.doc.customer_name}`);
-        frappe.msgprint(`Customer changing to ${selection.customer_name}`);        
+            if (selection.focused) {
+                selected_customer = customer_search_grid.getRowData(selection.focused.id);               
+                frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);        
+            }
+        
        }
 
        function afterCustomerChange(){
+      
         let selection = customer_search_grid.getSelection();
-        frappe.msgprint(`After Customer Change ${cur_frm.doc.customer_name}`);
-        frappe.msgprint(`Customer changed to ${cur_frm.doc.customer_name}}`);        
+            if (selection.focused) {
+                selected_customer = customer_search_grid.getRowData(selection.focused.id);               
+                frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);  
+                debugger
+                var item_list= [cur_frm.doc.items[0].name];
+                frappe.ui.POSCommandsBuilder.remove_item("POS Invoice Item", item_list);
+            }      
+              
        }
 </script>
 {% endblock %}
