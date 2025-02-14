@@ -11,10 +11,12 @@ class CustomPOSCommandsBuilder extends frappe.ui.POSCommandsBuilder {
     }
 
     add_new_customer(interface_profile, pos_invoice_name) {
+        
         frappe.msgprint("Overriding add_new_customer method...");
 
         super.add_new_customer(interface_profile, pos_invoice_name);
     }
 }
 
+// Overiding POSCommandsBuilder with CustomPOSCommandsBuilder 
 frappe.ui.POSCommandsBuilder = CustomPOSCommandsBuilder;
