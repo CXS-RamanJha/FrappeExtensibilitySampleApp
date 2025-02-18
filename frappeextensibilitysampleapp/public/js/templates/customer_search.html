@@ -8,34 +8,4 @@ frappe.pos_interface_builder.pos_commands.afterCustomerChange();
 
 {% block customer_search_script_block %}
 {{super()}}
-
-<script>   
-    
-    $(document).ready(function(){
-   
-       });
-
-       function beforeCustomerChange(){
-      
-        let selection = customer_search_grid.getSelection();
-            if (selection.focused) {
-                selected_customer = customer_search_grid.getRowData(selection.focused.id);               
-                frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);        
-            }
-        
-       }
-
-       function afterCustomerChange(){
-      
-        let selection = customer_search_grid.getSelection();
-            if (selection.focused) {
-                selected_customer = customer_search_grid.getRowData(selection.focused.id);               
-                frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);  
-                debugger
-                var item_list= [cur_frm.doc.items[0].name];
-                frappe.ui.POSCommandsBuilder.remove_item("POS Invoice Item", item_list);
-            }      
-              
-       }
-</script>
 {% endblock %}

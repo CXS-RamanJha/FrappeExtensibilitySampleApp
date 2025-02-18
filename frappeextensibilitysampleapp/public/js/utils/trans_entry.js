@@ -19,10 +19,27 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         console.log("Custom calculate_total function executed!");
         super.validate_add_pos_item(item_list, redirect_to_profile); // Call the original method
     }
-    beforeCustomerChange() {
-        alert("Before Customer Change");
-    }
-    afterCustomerChange() {
-        alert("after Customer Change");
-    }
+
+    beforeCustomerChange(){
+      
+        let selection = customer_search_grid.getSelection();
+            if (selection.focused) {
+                let selected_customer = customer_search_grid.getRowData(selection.focused.id);               
+                frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);        
+            }
+        
+       }
+
+       afterCustomerChange(){
+      
+        let selection = customer_search_grid.getSelection();
+            if (selection.focused) {
+                let selected_customer = customer_search_grid.getRowData(selection.focused.id);               
+                frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);  
+                debugger
+                var item_list= [cur_frm.doc.items[0].name];
+                frappe.ui.POSCommandsBuilder.remove_item("POS Invoice Item", item_list);
+            }      
+              
+       }
 }
