@@ -8,6 +8,7 @@ app_license = "mit"
 # Apps
 # ------------------frappeextensibilitysampleapp1
 
+
 app_include_js = [
 	"frappeextensibilitysampleapp.bundle.js"
 ]
