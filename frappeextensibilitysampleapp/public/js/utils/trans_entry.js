@@ -115,34 +115,41 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
     after_handle_set_quantity_command(me, cur_frm, inputField, item_list) {
         console.log("After Handle Set Quantity Command");
     }
+    before_void_item(pos_invoice) {
+        console.log("Before Void Item");
+    }
+    void_item(pos_invoice) {
+        this.before_void_item(pos_invoice);
+        super.void_item(pos_invoice);
+        this.after_void_item(pos_invoice);
+    }
+    after_void_item(pos_invoice) {
+        console.log("After Void Item");
+    }
     /**
      * Function to be called before the customer is changed.
      */
-    
-    beforeCustomerChange(){
-      
+    beforeCustomerChange() {
         let selection = customer_search_grid.getSelection();
-            if (selection.focused) {
-                let selected_customer = customer_search_grid.getRowData(selection.focused.id);               
-                frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);        
-            }
-        
-       }
-       
+        if (selection.focused) {
+            let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+            var item_list = [{ item_code: 'GD-001' }];
+            this.validate_add_pos_item(item_list, false);
+            frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
+        }
+    }
+
     /**
      * Function to be called after the customer is changed.
      */
-	afterCustomerChange(){
-      
+    afterCustomerChange() {
         let selection = customer_search_grid.getSelection();
-            if (selection.focused) {
-                let selected_customer = customer_search_grid.getRowData(selection.focused.id);               
-                frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);  
-                debugger
-                var item_list= [cur_frm.doc.items[0].name];
-                frappe.ui.POSCommandsBuilder.remove_item("POS Invoice Item", item_list);
-            }      
-              
-       }
-
+        if (selection.focused) {
+            let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+            frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);
+            var item_list = [this.pos_interface.selected_item_row["name"]];
+            //this.void_item(this.pos_invoice_name)
+            this.remove_item("POS Invoice Item", item_list);
+        }
+    }
 }
