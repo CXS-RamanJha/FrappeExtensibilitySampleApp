@@ -89,10 +89,12 @@ app_include_js = [
 
 # before_install = "frappeextensibilitysampleapp.install.before_install"
 # after_install = "frappeextensibilitysampleapp.install.after_install"
+after_install = "frappeextensibilitysampleapp.install.after_install"
+after_migrate = "frappeextensibilitysampleapp.install.after_migrate"
 
 # Uninstallation
 # ------------
-
+after_uninstall = "frappeextensibilitysampleapp.install.after_uninstall"
 # before_uninstall = "frappeextensibilitysampleapp.uninstall.before_uninstall"
 # after_uninstall = "frappeextensibilitysampleapp.uninstall.after_uninstall"
 

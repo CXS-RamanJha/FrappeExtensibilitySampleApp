@@ -117,5 +117,13 @@
     }
   };
   frappe.ui.POSCommandsBuilder = CustomPOSCommandsBuilder;
+
+  // ../frappeextensibilitysampleapp/frappeextensibilitysampleapp/public/js/utils/pos_complete_transaction.js
+  frappe.provide("ivend.confirm");
+  frappe.provide("frappe.ui");
+  frappe.ui.POSCommandsBuilder = class extends frappe.ui.POSCommandsBuilder {
+    _complete_transaction(profile_id, pos_invoice_name, quick_cash) {
+    }
+  };
 })();
-//# sourceMappingURL=frappeextensibilitysampleapp.bundle.N2A6RQH6.js.map
+//# sourceMappingURL=frappeextensibilitysampleapp.bundle.RK2QP4D3.js.map
