@@ -31,6 +31,7 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         user_defined_gc_number,
         weighted_qty) {
         console.log("Before Item Insert");
+        cur_frm.doc.custom_pos_invoice_sale_attribute['SaleAttribute1']["attribute_value"] = 'Avn';
     }
 
     add_pos_invoice_item(
@@ -120,7 +121,18 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
     }
     void_item(pos_invoice) {
         this.before_void_item(pos_invoice);
-        super.void_item(pos_invoice);
+        var item_list = [this.pos_interface.selected_item_row["name"]];
+        //if (me.pos_interface.selected_item_row.custom_is_cross_sell_item) {
+        cur_frm.doc.items.forEach(function (item) {
+            if (
+                item.custom_cross_sell_reference == item.name
+            ) {
+                item_list.push(item.name);
+            }
+        });
+        this.remove_reasons();
+        this.remove_transaction_item_attributes();
+        this.remove_item("POS Invoice Item", item_list);
         this.after_void_item(pos_invoice);
     }
     after_void_item(pos_invoice) {
@@ -129,14 +141,36 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
     /**
      * Function to be called before the customer is changed.
      */
-    beforeCustomerChange() {
+    async beforeCustomerChange() {
         let selection = customer_search_grid.getSelection();
-        if (selection.focused) {
-            let selected_customer = customer_search_grid.getRowData(selection.focused.id);
-            var item_list = [{ item_code: 'GD-001' }];
-            this.validate_add_pos_item(item_list, false);
-            frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
-        }
+        debugger;
+        //this.void_item(this.pos_invoice_name)
+        // setTimeout(async () => {//ChangePrice
+        //     if (selection.focused) {
+        //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+        //         // var item_list = [{ item_code: 'GD-001' }];
+        //         // this.validate_add_pos_item(item_list, false);
+        //         await this.changePrice();
+        //         // frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
+        //     }
+        // }, 500);
+        // setTimeout(async () => {//Change Customer
+        //     if (selection.focused) {
+        //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+        //         // var item_list = [{ item_code: 'GD-001' }];
+        //         // this.validate_add_pos_item(item_list, false);
+        //         await this.changeCustomer();
+        //         // frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
+        //     }
+        // }, 500);
+        setTimeout(async () => {
+            if (selection.focused) {
+                // await this.changeLineDiscount();//Change Line Discount percentage
+                //await this.changeLineDiscountAmount();//Change LineDiscount amount
+                //await this.changeSaleDiscount();    //Change sale Discount percentage            
+                await this.changePOSMode();
+            }
+        }, 200);
     }
 
     /**
@@ -147,9 +181,72 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         if (selection.focused) {
             let selected_customer = customer_search_grid.getRowData(selection.focused.id);
             frappe.msgprint(`Customer changed to ${selected_customer.customer_name}}`);
-            var item_list = [this.pos_interface.selected_item_row["name"]];
-            //this.void_item(this.pos_invoice_name)
-            this.remove_item("POS Invoice Item", item_list);
+            // var item_list = [this.pos_interface.selected_item_row["name"]];
+
+            // this.remove_item("POS Invoice Item", item_list);
         }
+    }
+    async changePrice() {
+        var row_name = cur_frm.doc.items[0].name;
+        try {
+            debugger
+            await this.edit_pos_invoice_item_row(this.pos_invoice_name, row_name, "Price Override", "1.00", true);
+            // await this.concurrent_edit_pos_invoice_item_row(
+            //     this.pos_invoice_name,
+            //     row_name,
+            //     "Price Override",
+            //     '1.00');
+        } catch (error) {
+            console.error("Error in changePrice:", error);
+        }
+    }
+    async changeCustomer() {
+        try {
+            await frappe.pos_interface_builder.pos_commands.add_pos_invoice_customer(
+                'C0019',
+                cur_frm.doc.name,
+                'C0019'
+            ).then(() => {
+                frappe.msgprint({ message: "{{ _('Customer Changed on POS.', '', 'iVendNext') }}", indicator: "green" });
+            });
+        }
+        catch (error) {
+            frappe.msgprint({ message: error, indicator: "red" });
+        }
+    }
+    async changeLineDiscount() {//Line Discount Percentage
+        var row_name = cur_frm.doc.items[0].name;
+        try {
+            debugger
+            await this.edit_pos_invoice_item_row(this.pos_invoice_name, row_name, "Line Discount Percent", "1.00", true);
+        } catch (error) {
+            console.error("Error in changePrice:", error);
+        }
+    }
+    async changeLineDiscountAmount() {//Line Discount Amount
+        var row_name = cur_frm.doc.items[0].name;
+        try {
+            debugger
+            await this.edit_pos_invoice_item_row(this.pos_invoice_name, row_name, "Line Discount Amount", "1.00", true);
+        } catch (error) {
+            console.error("Error in changePrice:", error);
+        }
+    }
+    async changeSaleDiscount() {//Sale Discount Amount/Percent
+        var row_name = cur_frm.doc.items[0].name;
+        try {
+            //await this.edit_pos_invoice_doc(this.pos_invoice_name, "Total Discount Amount", "1.00", true);
+            await this.edit_pos_invoice_doc(this.pos_invoice_name, "Total Discount Percent", "1.00", true);
+        } catch (error) {
+            console.error("Error in changePrice:", error);
+        }
+    }
+    async changePOSMode() {//Change POS Mode
+        await this.select_transaction_mode(
+            "Transaction Mode - Item Return",
+            this.pos_invoice_name,
+            null,
+            null
+        );
     }
 }
