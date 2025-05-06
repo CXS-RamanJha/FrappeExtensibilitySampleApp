@@ -144,36 +144,6 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
      */
     async beforeCustomerChange() {
         let selection = customer_search_grid.getSelection();
-<<<<<<< HEAD
-        debugger;
-        //this.void_item(this.pos_invoice_name)
-        // setTimeout(async () => {//ChangePrice
-        //     if (selection.focused) {
-        //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
-        //         // var item_list = [{ item_code: 'GD-001' }];
-        //         // this.validate_add_pos_item(item_list, false);
-        //         await this.changePrice();
-        //         // frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
-        //     }
-        // }, 500);
-        // setTimeout(async () => {//Change Customer
-        //     if (selection.focused) {
-        //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
-        //         // var item_list = [{ item_code: 'GD-001' }];
-        //         // this.validate_add_pos_item(item_list, false);
-        //         await this.changeCustomer();
-        //         // frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
-        //     }
-        // }, 500);
-        setTimeout(async () => {
-            if (selection.focused) {
-                // await this.changeLineDiscount();//Change Line Discount percentage
-                //await this.changeLineDiscountAmount();//Change LineDiscount amount
-                //await this.changeSaleDiscount();    //Change sale Discount percentage            
-                await this.changePOSMode();
-            }
-        }, 200);
-=======
         if (selection.focused) {
             
             let selected_customer = customer_search_grid.getRowData(selection.focused.id);
@@ -187,7 +157,6 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             getDataFromUDT();
             
         }
->>>>>>> f644f0d (Chnges for UDT and Payment)
     }
 
     /**
@@ -203,7 +172,7 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             // this.remove_item("POS Invoice Item", item_list);
         }
     }
-<<<<<<< HEAD
+
     async changePrice() {
         var row_name = cur_frm.doc.items[0].name;
         try {
@@ -267,7 +236,7 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             null
         );
     }
-=======
+
 
     insertDataIntoUDT() {
   
@@ -318,5 +287,5 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
     
                 
         }
->>>>>>> f644f0d (Chnges for UDT and Payment)
+
 }
