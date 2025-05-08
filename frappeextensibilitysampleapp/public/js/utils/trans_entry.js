@@ -31,7 +31,6 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         user_defined_gc_number,
         weighted_qty) {
         console.log("Before Item Insert");
-        cur_frm.doc.custom_pos_invoice_sale_attribute['SaleAttribute1']["attribute_value"] = 'Avn';
     }
 
     add_pos_invoice_item(
@@ -47,7 +46,7 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         frappe.msgprint("Before Customer Change");
         super.add_pos_invoice_item(item_list, pos_invoice, redirect_to_profile, user_defined_gc_number, weighted_qty); // Call the original method
         this.afterItemInsert(item_list, pos_invoice, redirect_to_profile, user_defined_gc_number, weighted_qty);
-        
+
     }
     /**
      * Function to be called after an item is inserted.
@@ -142,10 +141,54 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
     /**
      * Function to be called before the customer is changed.
      */
+    confirm_customer_change(mes, successbalback, failcallback) {
+        return new Promise((resolve) => {
+            frappe.confirm(
+                __('Manager override?'),
+                () => resolve(true),   // User clicked Yes
+                () => resolve(false)   // User clicked No
+            );
+        });
+    }
+    // async beforeCustomerChange() {
+    //     confirm_customer_change("Manager override?", function(){})
+    //     let selection = customer_search_grid.getSelection();
+    //     this.pos_interface.show_popup("manager_override");
+    //     debugger;
+    //     //this.void_item(this.pos_invoice_name)
+    //     // setTimeout(async () => {//ChangePrice
+    //     //     if (selection.focused) {
+    //     //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+    //     //         // var item_list = [{ item_code: 'GD-001' }];
+    //     //         // this.validate_add_pos_item(item_list, false);
+    //     //         await this.changePrice();
+    //     frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
+    //     //     }
+    //     // }, 500);
+    //     // setTimeout(async () => {//Change Customer
+    //     //     if (selection.focused) {
+    //     //         // let selected_customer = customer_search_grid.getRowData(selection.focused.id);
+    //     //         // var item_list = [{ item_code: 'GD-001' }];
+    //     //         // this.validate_add_pos_item(item_list, false);
+    //     //         await this.changeCustomer();
+    //     //         // frappe.msgprint(`Customer changing to ${selected_customer.customer_name}`);
+    //     //     }
+    //     // }, 500);
+    //     setTimeout(async () => {
+    //         if (selection.focused) {
+    //             // await this.changeLineDiscount();//Change Line Discount percentage
+    //             //await this.changeLineDiscountAmount();//Change LineDiscount amount
+    //             //await this.changeSaleDiscount();    //Change sale Discount percentage
+    //             // await this.changePOSMode();
+    //             // await this.SuspendTransaction();
+    //             //await this.recall_transaction();
+    //         }
+    //     }, 200);
+    // }
     async beforeCustomerChange() {
         let selection = customer_search_grid.getSelection();
         if (selection.focused) {
-            
+
             let selected_customer = customer_search_grid.getRowData(selection.focused.id);
             var item_list = [{ item_code: 'GD-001' }];
             this.validate_add_pos_item(item_list, false);
@@ -155,9 +198,21 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             insertDataIntoUDT();
             // Get from UDT 
             getDataFromUDT();
-            
+
         }
+        return new Promise(async (resolve) => {
+            if (!frappe.pos_interface_builder.manager_login || frappe.pos_interface_builder.manager_login == undefined) {
+                await frappe.pos_interface_builder.show_popup('manager_override')
+                if (frappe.pos_interface_builder.manager_login) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            }
+        });
+
     }
+
 
     /**
      * Function to be called after the customer is changed.
@@ -172,7 +227,11 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             // this.remove_item("POS Invoice Item", item_list);
         }
     }
-
+    async add_pos_invoice_customer(customer, pos_invoice, customer_name) {
+        this.beforeCustomerChange();
+        super.add_pos_invoice_customer(customer, pos_invoice, customer_name);
+        //this.afterCustomerChange();
+    }
     async changePrice() {
         var row_name = cur_frm.doc.items[0].name;
         try {
@@ -186,6 +245,15 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         } catch (error) {
             console.error("Error in changePrice:", error);
         }
+    }
+    on_button_click(cmd) {
+        // debugger;
+        super.on_button_click(cmd);
+        // this.pos_interface.show_popup("transaction_item_attribute");
+        // this.SetLineAttribute();
+        // this.GetSaleAttribute();
+
+        // this.SetSaleAttribute();
     }
     async changeCustomer() {
         try {
@@ -236,12 +304,89 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
             null
         );
     }
+    async SuspendTransaction() {
+        this.suspend_pos_invoice();
+        this.end_manager_session();
 
+    }
+    async recall_transaction() {
+        this.recall_suspended_transaction(['RET-PSINV-2025-00168'])   //
+    }
+    _complete_transaction(profile_id, pos_invoice_name, quick_cash) {
+
+        // var me = this;
+        // frappe.msgprint(me);
+        super._complete_transaction(profile_id, pos_invoice_name, quick_cash);
+        // this.pos_interface.show_popup("sale_attribute");
+        // this.pos_interface.show_popup("transaction_item_attribute");
+
+    }
+    SetSaleAttribute() {
+        var attribute_idx = cur_frm.doc.custom_pos_invoice_sale_attribute.findIndex(
+            (x) => x.sale_attribute == "SaleAttribute1");
+        cur_frm.doc.custom_pos_invoice_sale_attribute[attribute_idx]["attribute_value"] = "Avn";
+        attribute_idx = cur_frm.doc.custom_pos_invoice_sale_attribute.findIndex(
+            (x) => x.sale_attribute == "SaleAttribute2");
+        cur_frm.doc.custom_pos_invoice_sale_attribute[attribute_idx]["attribute_value"] = "Avn";
+    }
+    GetSaleAttribute() {
+        var attribute_idx = cur_frm.doc.custom_pos_invoice_sale_attribute.findIndex(
+            (x) => x.sale_attribute == "SaleAttribute1");
+        console.log(cur_frm.doc.custom_pos_invoice_sale_attribute[attribute_idx]["attribute_value"]);
+    }
+    SetLineAttribute() {
+        var attribute_idx = cur_frm.doc.custom_pos_invoice_transaction_item_attribute.findIndex(
+            (x) => x.transaction_item_attribute == "ItemAttribute1");
+        if (attribute_idx < 0) {
+            var row_name = cur_frm.doc.items[0];
+            cur_frm.doc.custom_pos_invoice_transaction_item_attribute.push({
+                transaction_item_attribute: 'ItemAttribute1',
+                attribute_value: 'Avnish Verma',
+                item_ref: row_name["item_code"],
+                item_id_ref: row_name["name"],
+                row_no_ref: row_name["idx"],
+                docstatus: 0,
+                doctype: "POS Invoice Transaction Item Attribute",
+                name: frappe.utils.get_random(10),
+                parentfield: "custom_pos_invoice_transaction_item_attribute",
+                parenttype: "POS Invoice",
+            });
+            // item_attribute_exist_dict[field.attribute_name] = true;
+        } else
+            cur_frm.doc.custom_pos_invoice_transaction_item_attribute[attribute_idx]["attribute_value"] = "Avn";
+        // attribute_idx = cur_frm.doc.custom_pos_invoice_transaction_item_attribute.findIndex(
+        //     (x) => x.transaction_item_attribute == "ItemAttribute2");
+        // cur_frm.doc.custom_pos_invoice_transaction_item_attribute[attribute_idx]["attribute_value"] = "Avn";
+        // var row_name = cur_frm.doc.items[0].name;
+        // if (item_attribute_exist_dict && item_attribute_exist_dict[field.attribute_name]) {
+        //     attribute_idx = cur_frm.doc.custom_pos_invoice_transaction_item_attribute.findIndex(
+        //         (x) => x.transaction_item_attribute == field.attribute_name && x.item_ref == trx_item_attr_sel_item["item_code"] && x.item_id_ref == trx_item_attr_sel_item["name"]
+        //     );
+        //     cur_frm.doc.custom_pos_invoice_transaction_item_attribute[attribute_idx]["attribute_value"] = transaction_item_attribute_form.value?.[field.dataField] || "";
+        // } else {
+        //     if (transaction_item_attribute_form.value?.[field.dataField]) {
+        //         cur_frm.doc.custom_pos_invoice_transaction_item_attribute.push({
+        //             transaction_item_attribute: field.attribute_name,
+        //             attribute_value: transaction_item_attribute_form.value[field.dataField],
+        //             item_ref: trx_item_attr_sel_item["item_code"],
+        //             item_id_ref: trx_item_attr_sel_item["name"],
+        //             row_no_ref: trx_item_attr_sel_item["idx"],
+        //             docstatus: 0,
+        //             doctype: "POS Invoice Transaction Item Attribute",
+        //             name: frappe.utils.get_random(10),
+        //             parentfield: "custom_pos_invoice_transaction_item_attribute",
+        //             parenttype: "POS Invoice",
+        //         });
+        //         item_attribute_exist_dict[field.attribute_name] = true;
+        //     }
+        // }
+
+    }
 
     insertDataIntoUDT() {
-  
+
         invoiceloggingsubsystem.insert_record("trx001", "qrcode");
-        
+
         // frappe.call({
         //     method: "frappeextensibilitysampleapp.udtsubsystemsapi.insert_udt_record",
         //     args: {
@@ -256,36 +401,36 @@ frappe.ui.POSCommandsBuilder = class CustomPosCommandsBuilder extends frappe.ui.
         //         }
         //     }
         // });
-        }
-    
-        getDataFromUDT() {
-            // Get from UDT   
-            frappe.call({
-                method: "frappeextensibilitysampleapp.udtsubsystemsapi.get_udt_records", 
-                callback: function(response) {
-                    if (response.message && response.message.length > 0) {
-                        let message = response.message
-                            .map(row => `${row.column1} - ${row.column2}`)
-                            .join("\n");
-                        frappe.msgprint(`UDT Records:\n${message}`);
-                    } else {
-                        frappe.msgprint("No records found in UDT table.");
-                    }
-                }
-            });
-            
-            /*
-                results =invoiceloggingsubsystem.get_records();
-                if (results && Array.isArray(results)) {
-                    let message = results.map(row => `${row.transactionkey || 'N/A'} - ${row.qrcode || 'N/A'}`).join("\n");
+    }
+
+    getDataFromUDT() {
+        // Get from UDT   
+        frappe.call({
+            method: "frappeextensibilitysampleapp.udtsubsystemsapi.get_udt_records",
+            callback: function (response) {
+                if (response.message && response.message.length > 0) {
+                    let message = response.message
+                        .map(row => `${row.column1} - ${row.column2}`)
+                        .join("\n");
                     frappe.msgprint(`UDT Records:\n${message}`);
-                } 
-                else {
+                } else {
                     frappe.msgprint("No records found in UDT table.");
                 }
-                */
-    
-                
-        }
+            }
+        });
+
+        /*
+            results =invoiceloggingsubsystem.get_records();
+            if (results && Array.isArray(results)) {
+                let message = results.map(row => `${row.transactionkey || 'N/A'} - ${row.qrcode || 'N/A'}`).join("\n");
+                frappe.msgprint(`UDT Records:\n${message}`);
+            } 
+            else {
+                frappe.msgprint("No records found in UDT table.");
+            }
+            */
+
+
+    }
 
 }
